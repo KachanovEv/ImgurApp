@@ -1,4 +1,4 @@
-package com.project.eugene.imgurapp;
+package com.project.eugene.imgurapp.slide;
 
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.project.eugene.imgurapp.R;
+import com.project.eugene.imgurapp.gallery.GalleryItemModel;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -16,15 +18,15 @@ import java.util.List;
 public class SlideShowPagerAdapter extends PagerAdapter {
 
     Context mContext;
-    //Layout inflater
-    LayoutInflater mLayoutInflater;
-    //list of Gallery Items
-    List<GalleryItem> galleryItems;
 
-    public SlideShowPagerAdapter(Context context, List<GalleryItem> galleryItems) {
+    LayoutInflater mLayoutInflater;
+
+    List<GalleryItemModel> galleryItems;
+
+    public SlideShowPagerAdapter(Context context, List<GalleryItemModel> galleryItems) {
         mContext = context;
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        //set galleryItems
+
         this.galleryItems = galleryItems;
     }
 
@@ -42,7 +44,7 @@ public class SlideShowPagerAdapter extends PagerAdapter {
     public Object instantiateItem(ViewGroup container, int position) {
         View itemView = mLayoutInflater.inflate(R.layout.pager_item, container, false);
         ImageView imageView = (ImageView) itemView.findViewById(R.id.imageViewThumbnail);
-        //load current image in viewpager
+
         Picasso.get().load(new File(galleryItems.get(position).imageUri)).fit().into(imageView);
         container.addView(itemView);
         return itemView;

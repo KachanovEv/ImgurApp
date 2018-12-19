@@ -1,4 +1,4 @@
-package com.project.eugene.imgurapp;
+package com.project.eugene.imgurapp.SquareLayout;
 
 
 
@@ -8,7 +8,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
-//square layout
+
 public class SquareLayout extends RelativeLayout {
 
     public SquareLayout(Context context) {

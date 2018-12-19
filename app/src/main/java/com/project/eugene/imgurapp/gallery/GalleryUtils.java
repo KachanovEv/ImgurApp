@@ -1,4 +1,4 @@
-package com.project.eugene.imgurapp;
+package com.project.eugene.imgurapp.gallery;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -19,8 +19,8 @@ public class GalleryUtils {
         return String.valueOf(path.toLowerCase().hashCode());
     }
 
-    //method to get images
-    public static List<GalleryItem> getImages(Context context) {
+
+    public static List<GalleryItemModel> getImages(Context context) {
         final String[] projection = {MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.DATA};
         final String selection = MediaStore.Images.Media.BUCKET_ID + " = ?";
         final String[] selectionArgs = {GalleryUtils.getBucketId(CAMERA_IMAGE_BUCKET_NAME)};
@@ -29,12 +29,12 @@ public class GalleryUtils {
                 selection,
                 selectionArgs,
                 null);
-        ArrayList<GalleryItem> result = new ArrayList<GalleryItem>(cursor.getCount());
+        ArrayList<GalleryItemModel> result = new ArrayList<>(cursor.getCount());
         if (cursor.moveToFirst()) {
             final int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             final int nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
             do {
-                GalleryItem galleryItem = new GalleryItem(cursor.getString(dataColumn), cursor.getString(nameColumn));
+                GalleryItemModel galleryItem = new GalleryItemModel(cursor.getString(dataColumn), cursor.getString(nameColumn));
                 result.add(galleryItem);
             } while (cursor.moveToNext());
         }

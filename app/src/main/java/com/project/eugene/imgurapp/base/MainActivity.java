@@ -1,4 +1,4 @@
-package com.project.eugene.imgurapp;
+package com.project.eugene.imgurapp.base;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -18,6 +18,12 @@ import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
 
 import com.android.internal.http.multipart.MultipartEntity;
+import com.project.eugene.imgurapp.R;
+import com.project.eugene.imgurapp.slide.SlideShowFragment;
+import com.project.eugene.imgurapp.gallery.GalleryAdapter;
+import com.project.eugene.imgurapp.gallery.GalleryAdapterCallBacks;
+import com.project.eugene.imgurapp.gallery.GalleryItemModel;
+import com.project.eugene.imgurapp.gallery.GalleryUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -31,36 +37,32 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-//Remember to implement  GalleryAdapter.GalleryAdapterCallBacks to activity  for communication of Activity and Gallery Adapter
-public class MainActivity extends AppCompatActivity implements GalleryAdapter.GalleryAdapterCallBacks {
-    //Deceleration of list of  GalleryItems
-    public List<GalleryItem> galleryItems;
-    //Read storage permission request code
+
+public class MainActivity extends AppCompatActivity implements GalleryAdapterCallBacks {
+
+    public List<GalleryItemModel> galleryItems;
+
     private static final int RC_READ_STORAGE = 5;
     GalleryAdapter mGalleryAdapter;
+    private BreakIterator reviewEdit;
+
 
     public void post(String path) {
-
 
         List<NameValuePair> postContent = new ArrayList<NameValuePair>(2);
         postContent.add(new BasicNameValuePair("key", DEV_KEY));
         postContent.add(new BasicNameValuePair("image", path));
 
-        // Great! Now you can get started with the API!
-        //       For public read-only and anonymous resources, such as getting image info, looking up user comments, etc.
-        //       all you need to do is send an authorization header with your client_id in your requests.
-        //      This also works if you'd like to upload images anonymously (without the image being tied to an account),
-        //  or if you'd like to create an anonymous album. This lets us know which application is accessing the API.
-
         //  Authorization: Client-ID YOUR_CLIENT_ID
 
-       // For accessing a user's account, please visit the OAuth2 section of the docs.
+        // For accessing a user's account, please visit the OAuth2 section of the docs.
 
         //Client ID:
         //
@@ -80,10 +82,10 @@ public class MainActivity extends AppCompatActivity implements GalleryAdapter.Ga
 
             for(int index=0; index < postContent.size(); index++) {
                 if(postContent.get(index).getName().equalsIgnoreCase("image")) {
-                    // If the key equals to "image", we use FileBody to transfer the data
+
                     entity.addPart(postContent.get(index).getName(), new FileBody(new File(postContent.get(index).getValue())));
                 } else {
-                    // Normal string data
+
                     entity.addPart(postContent.get(index).getName(), new StringBody(postContent.get(index).getValue()));
                 }
             }
@@ -142,53 +144,60 @@ public class MainActivity extends AppCompatActivity implements GalleryAdapter.Ga
     }
 
 
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
 
-        //This is toolbar
+        initToolbar();
+
+        initRecycleView();
+
+        initListeners();
+    }
+
+    private void initToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Album");
-        setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar);}
 
+    private void initListeners() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
+            galleryItems = GalleryUtils.getImages(this);
 
-        //setup RecyclerView
+            mGalleryAdapter.addGalleryItems(galleryItems);
+        } else {
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, RC_READ_STORAGE);
+        }
+    }
+
+    private void initRecycleView() {
         RecyclerView recyclerViewGallery = (RecyclerView) findViewById(R.id.recyclerViewGallery);
         recyclerViewGallery.setLayoutManager(new GridLayoutManager(this, 3));
 
         recyclerViewGallery.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
 
-        //Create RecyclerView Adapter
+
         mGalleryAdapter = new GalleryAdapter(this);
 
-        //set adapter to RecyclerView
+
         recyclerViewGallery.setAdapter(mGalleryAdapter);
-
-        //check for read storage permission
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            //Get images
-            galleryItems = GalleryUtils.getImages(this);
-            // add images to gallery recyclerview using adapter
-            mGalleryAdapter.addGalleryItems(galleryItems);
-        } else {
-            //request permission
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, RC_READ_STORAGE);
-        }
-
-
     }
 
 
     @Override
     public void onItemSelected(int position) {
-        //create fullscreen SlideShowFragment dialog
+
         SlideShowFragment slideShowFragment = SlideShowFragment.newInstance(position);
-        //setUp style for slide show fragment
+
         slideShowFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
-        //finally show dialogue
+
         slideShowFragment.show(getSupportFragmentManager(), null);
     }
 
@@ -197,9 +206,9 @@ public class MainActivity extends AppCompatActivity implements GalleryAdapter.Ga
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == RC_READ_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //Get images
+
                 galleryItems = GalleryUtils.getImages(this);
-                // add images to gallery recyclerview using adapter
+
                 mGalleryAdapter.addGalleryItems(galleryItems);
             } else {
                 Toast.makeText(this, "Storage Permission denied", Toast.LENGTH_SHORT).show();

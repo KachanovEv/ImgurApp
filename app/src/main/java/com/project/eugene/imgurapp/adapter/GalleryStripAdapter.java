@@ -1,4 +1,4 @@
-package com.project.eugene.imgurapp.gallery;
+package com.project.eugene.imgurapp.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -11,31 +11,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.project.eugene.imgurapp.model.GalleryItemModel;
 import com.project.eugene.imgurapp.R;
-import com.project.eugene.imgurapp.ScreenSize.ScreenUtils;
-import com.project.eugene.imgurapp.SquareLayout.SquareLayout;
+import com.project.eugene.imgurapp.util.ScreenUtils;
+import com.project.eugene.imgurapp.custom_view.SquareLayout;
 
 import java.util.List;
 
 
 public class GalleryStripAdapter extends RecyclerView.Adapter {
-
-    List<GalleryItemModel> galleryItems;
+    //Declare list of GalleryItems
+    List<GalleryItemModel> galleryItemModels;
     Context context;
     GalleryStripCallBacks mStripCallBacks;
     GalleryItemModel mCurrentSelected;
 
-    final int thumbSize = 6;
-
-    public GalleryStripAdapter(List<GalleryItemModel> galleryItems, Context context, GalleryStripCallBacks StripCallBacks, int CurrentPosition) {
-
-        this.galleryItems = galleryItems;
+    public GalleryStripAdapter(List<GalleryItemModel> galleryItemModels, Context context, GalleryStripCallBacks StripCallBacks, int CurrentPosition) {
+        //set galleryItemModels
+        this.galleryItemModels = galleryItemModels;
         this.context = context;
-
+        //set stripcallbacks
         this.mStripCallBacks = StripCallBacks;
-
-        mCurrentSelected = galleryItems.get(CurrentPosition);
-
+        //set current selected
+        mCurrentSelected = galleryItemModels.get(CurrentPosition);
+        //set current selected item as selected
         mCurrentSelected.isSelected = true;
     }
 
@@ -49,28 +48,28 @@ public class GalleryStripAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-
-        GalleryItemModel mCurrentItem = galleryItems.get(position);
-
-
-
+        //get Curent Gallery Item
+        GalleryItemModel mCurrentItem = galleryItemModels.get(position);
+        //get thumb square size 1/6 of screen width
+        final int thumbSize = ScreenUtils.getScreenWidth(context) / 6;
+        //cast holder to galleryStripItemHolder
         GalleryStripItemHolder galleryStripItemHolder = (GalleryStripItemHolder) holder;
-
+        //get thumb size bitmap by using ThumbnailUtils
         Bitmap ThumbImage = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(mCurrentItem.imageUri),
                 thumbSize, thumbSize);
-
+        //set thumbnail
         galleryStripItemHolder.imageViewThumbnail.setImageBitmap(ThumbImage);
-
+        //set current selected
         if (mCurrentItem.isSelected) {
             galleryStripItemHolder.imageViewThumbnail.setBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
         } else {
-
+            //value 0 removes any background color
             galleryStripItemHolder.imageViewThumbnail.setBackgroundColor(0);
         }
         galleryStripItemHolder.imageViewThumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                //call onGalleryStripItemSelected on click and pass position
                 mStripCallBacks.onGalleryStripItemSelected(position);
             }
         });
@@ -78,7 +77,7 @@ public class GalleryStripAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        return galleryItems.size();
+        return galleryItemModels.size();
     }
 
     public class GalleryStripItemHolder extends RecyclerView.ViewHolder {
@@ -90,27 +89,27 @@ public class GalleryStripAdapter extends RecyclerView.Adapter {
         }
     }
 
-
+    //interface for communication on gallery strip interactions
     public interface GalleryStripCallBacks {
         void onGalleryStripItemSelected(int position);
     }
 
-
+    //Method to highlight  selected item on gallery strip
     public void setSelected(int position) {
-
+        //remove current selection
         mCurrentSelected.isSelected = false;
-
-        notifyItemChanged(galleryItems.indexOf(mCurrentSelected));
-
-        galleryItems.get(position).isSelected = true;
-
+        //notify recyclerview that we changed  item to update its view
+        notifyItemChanged(galleryItemModels.indexOf(mCurrentSelected));
+        //select gallery item
+        galleryItemModels.get(position).isSelected = true;
+        //notify recyclerview that we changed  item to update its view
         notifyItemChanged(position);
-
-        mCurrentSelected = galleryItems.get(position);
+        //set current selected
+        mCurrentSelected = galleryItemModels.get(position);
 
     }
 
-
+    //method to remove selection
     public void removeSelection() {
         mCurrentSelected.isSelected = false;
     }

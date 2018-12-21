@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="8dp"
-        tools:context=".base.MainActivity">
+        tools:context=".ui.activity.MainActivity">
     <android.support.v7.widget.RecyclerView
 
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical"
-        tools:context="com.project.eugene.imgurapp.base.MainActivity"
+        tools:context=".ui.activity.MainActivity"
         tools:showIn="@layout/activity_main" />
 
 

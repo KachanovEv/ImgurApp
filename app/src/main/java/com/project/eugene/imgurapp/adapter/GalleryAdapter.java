@@ -1,4 +1,4 @@
-package com.project.eugene.imgurapp.gallery;
+package com.project.eugene.imgurapp.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -8,9 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-
+import com.project.eugene.imgurapp.model.GalleryItemModel;
 import com.project.eugene.imgurapp.R;
-import com.project.eugene.imgurapp.ScreenSize.ScreenUtils;
+import com.project.eugene.imgurapp.util.ScreenUtils;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -18,26 +18,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class GalleryAdapter extends RecyclerView.Adapter implements GalleryAdapterCallBacks {
-
-    List<GalleryItemModel> galleryItems;
+public class GalleryAdapter extends RecyclerView.Adapter {
+    //Declare GalleryItems List
+    List<GalleryItemModel> galleryItemModels;
     Context context;
-
+    //Declare GalleryAdapterCallBacks
     GalleryAdapterCallBacks mAdapterCallBacks;
 
     public GalleryAdapter(Context context) {
         this.context = context;
-
+        //get GalleryAdapterCallBacks from contex
         this.mAdapterCallBacks = (GalleryAdapterCallBacks) context;
-
-        this.galleryItems = new ArrayList<>();
+        //Initialize GalleryItemModel List
+        this.galleryItemModels = new ArrayList<>();
     }
 
-
-    public void addGalleryItems(List<GalleryItemModel> galleryItems) {
-        int previousSize = this.galleryItems.size();
-        this.galleryItems.addAll(galleryItems);
-        notifyItemRangeInserted(previousSize, galleryItems.size());
+    //This method will take care of adding new Gallery items to RecyclerView
+    public void addGalleryItems(List<GalleryItemModel> galleryItemModels) {
+        int previousSize = this.galleryItemModels.size();
+        this.galleryItemModels.addAll(galleryItemModels);
+        notifyItemRangeInserted(previousSize, galleryItemModels.size());
 
     }
 
@@ -50,25 +50,25 @@ public class GalleryAdapter extends RecyclerView.Adapter implements GalleryAdapt
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-
-        GalleryItemModel currentItem = galleryItems.get(position);
-
+        //get current Gallery Item
+        GalleryItemModel currentItem = galleryItemModels.get(position);
+        //Create file to load with Picasso lib
         File imageViewThoumb = new File(currentItem.imageUri);
-
+        //cast holder with gallery holder
         GalleryItemHolder galleryItemHolder = (GalleryItemHolder) holder;
-
+        //Load with Picasso
         Picasso.get()
                 .load(imageViewThoumb)
                 .centerCrop()
                 .resize(ScreenUtils.getScreenWidth(context) / 2, ScreenUtils.getScreenHeight(context) / 3)
                 .into(galleryItemHolder.imageViewThumbnail);
-
+        //set name of Image
         galleryItemHolder.textViewImageName.setText(currentItem.imageName);
-
+        //set on click listener on imageViewThumbnail
         galleryItemHolder.imageViewThumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                //call onItemSelected method and pass the position and let activity decide what to do when item selected
                 mAdapterCallBacks.onItemSelected(position);
             }
         });
@@ -77,12 +77,7 @@ public class GalleryAdapter extends RecyclerView.Adapter implements GalleryAdapt
 
     @Override
     public int getItemCount() {
-        return galleryItems.size();
-    }
-
-    @Override
-    public void onItemSelected(int position) {
-
+        return galleryItemModels.size();
     }
 
     public class GalleryItemHolder extends RecyclerView.ViewHolder {
@@ -97,7 +92,11 @@ public class GalleryAdapter extends RecyclerView.Adapter implements GalleryAdapt
         }
     }
 
-
+    //Interface for communication of Adapter and MainActivity
+    public interface GalleryAdapterCallBacks {
+        //call this method to notify about item is clicked
+        void onItemSelected(int position);
+    }
 
 
 }

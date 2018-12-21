@@ -1,4 +1,4 @@
-package com.project.eugene.imgurapp.ScreenSize;
+package com.project.eugene.imgurapp.util;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,7 +12,6 @@ public class ScreenUtils {
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         return displayMetrics.widthPixels;
     }
-
 
     public static int getScreenHeight(Context context) {
         DisplayMetrics displayMetrics = new DisplayMetrics();

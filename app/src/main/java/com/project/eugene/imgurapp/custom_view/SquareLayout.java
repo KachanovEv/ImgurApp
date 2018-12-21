@@ -1,5 +1,4 @@
-package com.project.eugene.imgurapp.SquareLayout;
-
+package com.project.eugene.imgurapp.custom_view;
 
 
 import android.annotation.TargetApi;
@@ -7,7 +6,6 @@ import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
-
 
 public class SquareLayout extends RelativeLayout {
 
